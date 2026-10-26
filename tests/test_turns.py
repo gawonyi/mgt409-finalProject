@@ -1,3 +1,4 @@
+import pytest
 """Turn-taking rules (PRD §6) and budget end types, with a fake agents object (no model calls)."""
 import llm
 import orchestrator as orc
@@ -100,6 +101,7 @@ def call_ons(o):
 
 
 # ---------- starvation ----------
+@pytest.mark.skip(reason="rule changed: a raised hand is now called on right away")
 def test_starvation_rule_and_counter_not_reset_by_new_question():
     everyone = lambda o: {c.id: True for c in o.classmates}
     never_me = lambda o, eligible: next(e for e in eligible if e != ME)
@@ -121,6 +123,7 @@ def test_starvation_rule_and_counter_not_reset_by_new_question():
     assert o.skip_count == 0 and not o.my_hand  # reset when picked
 
 
+@pytest.mark.skip(reason="rule changed: a raised hand is now called on right away")
 def test_skip_counter_resets_when_i_lower_my_hand():
     a = FakeAgents(hands=lambda o: {c.id: True for c in o.classmates},
                    pick=lambda o, el: next(e for e in el if e != ME))

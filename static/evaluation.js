@@ -84,7 +84,7 @@
         <img src="/static/img/sprites/brunette_front.png" alt="">
         <div><div class="said">${esc(p.said)}</div>
         <div class="polished">${esc(p.polished)} ${p.cited_ids?.length ? `<span class="cite">[${esc(p.cited_ids.join(", "))}]</span>` : ""}</div></div>
-        <button class="btn small" data-play="${esc(p.polished)}" title="Play with browser voice">▶ Play</button></div>`).join("")
+        </div>`).join("")
         || "<p>You did not speak this session.</p>"}</div>`;
 
     const expr = `<div class="card pad"><h2>Recommended expressions &amp; words</h2>

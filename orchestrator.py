@@ -266,7 +266,7 @@ class Orchestrator:
             return self._call_on(pick, "no_hands")
 
         # 4. starvation rule
-        if self.my_hand and self.skip_count >= 2:
+        if self.my_hand:  # v1 rule: if my hand is up, the professor calls on me next
             self.flags["starvation"] = True
             self.note("starvation", skip_count=self.skip_count)
             return self._select([ME], "starvation")

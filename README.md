@@ -44,11 +44,7 @@ Then open **http://localhost:8000**.
 class and the evaluation work without a microphone. If speech recognition is unavailable or fails,
 Hand Up! switches to typing automatically and shows why.
 
-**Voice output is off by default.** The point is practicing *your* speaking, so the professor's and
-classmates' lines appear as a typed script. Turn on **🔊 Read professor & classmate lines aloud**
-on Home, or the 🔊 button in class, to hear them in the browser's natural voices (e.g. Daniel,
-Samantha, Karen, Moira on macOS; Google voices in Chrome). The ▶ Play button on polished lines always
-works.
+**No read-aloud.** The professor's and classmates' lines appear as a typed script (browser text-to-speech was removed in v1 because voices sounded unnatural). Your own answers can still be spoken (Chrome) or typed.
 
 ## Try the demo
 
@@ -110,9 +106,7 @@ or right away when you click the dialogue box.
 
 - **Cold call** applies to you only. Its probability comes from the professor's slider, and it never
   happens twice in a row.
-- **Starvation rule.** If your hand was up and you were skipped twice, you are the only eligible
-  speaker next. The counter resets when you are picked or lower your hand; it does not reset when
-  the question changes.
+- **Your raised hand comes first.** If your hand is up, the professor calls on you next (no waiting).
 - **No hands.** The professor rephrases once with a hint. If there are still no hands, the
   orchestrator picks you or a classmate ("No hands, so…").
 

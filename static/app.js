@@ -385,7 +385,7 @@ function setTTS(on) {
 }
 $("ttsBtn").onclick = () => setTTS(!Voice.enabled());
 $("readAloud").onchange = () => setTTS($("readAloud").checked);
-if (!Voice.hasTTS) { $("ttsBtn").hidden = true; $("readAloud").disabled = true; }
+setTTS(false); $("ttsBtn").hidden = true; $("readAloud").disabled = true; // v1: read-aloud (TTS) removed; lines are shown as a script
 setTTS(Voice.enabled()); // default off; remembers the viewer's last choice
 
 async function checkMic(ask) {
