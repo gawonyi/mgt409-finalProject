@@ -38,7 +38,7 @@ def get_client():
         key = os.environ.get("PORTKEY_API_KEY")
         if not key:
             raise LLMError(
-                "PORTKEY_API_KEY is not set. Put it in hand-up/.env or in the folder above."
+                "PORTKEY_API_KEY is not set. Put it in .env in the repo folder or in the folder above."
             )
         _client = OpenAI(
             api_key=key,

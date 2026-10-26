@@ -7,7 +7,7 @@ classroom; reuse its tokens, layout, iso() helper and seat table).
 Image assets live in static/img/ (room.png, characters.png, layout.json with seat,
 professor coordinates); if they are missing, fall back to the
 code-drawn scene from the mockup. They are the spec for my MGT 409 final
-project, "Hand Up!" (repo name: hand-up; tagline: "Raise your hand before the
+project, "Hand Up!" (repo name: mgt409-finalProject; tagline: "Raise your hand before the
 real class does."), a voice-first mock class discussion app. The PRD wins if
 anything below seems to conflict with it.
 

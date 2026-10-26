@@ -1,7 +1,7 @@
 # Hand Up! — PRD v4.1 (built from MGT 411 Session 1 materials)
 
 Author: Gawon Yi · 2026-10-26 · Status: approved for build
-Service name: **Hand Up!** (final). Tagline: *"Raise your hand before the real class does."* Repo: `hand-up`.
+Service name: **Hand Up!** (final). Tagline: *"Raise your hand before the real class does."* Repo: `mgt409-finalProject`.
 
 Changes from v3: turn-taking authority and states defined (§6), voice constraints and full typing fallback (§7), first-session vs later evaluation (§5 Screen 3), three-state course AI policy (§5, §11), scope for today (§13), experiment design (§14), cost at 100 / 10,000 users (§10), source IDs on facts, flowcharts updated.
 v4.1 (second review): bundled demo allowlist, budget reservation + two end types, cold call vs no-hands fallback, follow-up keeps the speaker, TTS timeout, skip-counter reset, grounding/caching/policy-note caveats.

@@ -43,7 +43,7 @@ MODEL = "gpt-6-luna"   # course key allows only this model; plain name, no "@ope
 ## Keys and .env
 - Key name: `PORTKEY_API_KEY` (optional `OPENAI_API_KEY`, unused).
 - Load `.env` from the repo folder first, then **one folder above** (the graders put it there).
-  For local dev the user can copy their key into `hand-up/.env` (git-ignored).
+  For local dev the user can copy their key into `.env` in the repo folder (git-ignored).
 - Never print, log, or commit a key. Commit `.env.example` with empty values.
 
 ## Running (the user is on macOS, runs commands in the VS Code terminal)
@@ -67,4 +67,4 @@ MODEL = "gpt-6-luna"   # course key allows only this model; plain name, no "@ope
 - Real course cases/slides stay local (`cases/`, `uploads/` are git-ignored). Only the
   fictional sample case goes into `samples/`.
 - Do not add features beyond PRD §13 "Must" items.
-- Git: repo name `hand-up`, public. Commit only when the user asks.
+- Git: repo `gawonyi/mgt409-finalProject`, public. Commit only when the user asks.
