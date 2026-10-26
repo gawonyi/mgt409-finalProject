@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+.DS_Store
+data/sessions/
+logs/
+uploads/
+cases/
+.pytest_cache/
+data/courses/
+.claude/

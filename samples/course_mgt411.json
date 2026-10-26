@@ -1,0 +1,28 @@
+{
+  "id": "mgt411",
+  "name": "MGT 411 Customer",
+  "professor": {
+    "name": "Prof. Shin",
+    "style": "TODO(user): describe the professor's style in your own words.",
+    "signature_moves": "",
+    "sliders": {
+      "cold_call": 3,
+      "follow_up_pressure": 3,
+      "framework_emphasis": 4,
+      "evidence_demand": 4,
+      "warmth": 3
+    }
+  },
+  "ai_policy": {
+    "state": "not_confirmed",
+    "source_note": ""
+  },
+  "schedule": [
+    {
+      "session": "demo",
+      "title": "Demo: Brightloaf Bakery (fictional)",
+      "questions_file": "demo_questions.json",
+      "case_file": "demo_case.md"
+    }
+  ]
+}

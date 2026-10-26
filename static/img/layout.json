@@ -1,0 +1,95 @@
+{
+  "image": "room.png",
+  "size": [
+    1671,
+    941
+  ],
+  "viewport": {
+    "x": 300,
+    "y": 330,
+    "w": 1320,
+    "h": 575
+  },
+  "student_scale": 0.85,
+  "professor_scale": 0.82,
+  "student_rule": "Use <name>_back.png flipped horizontally (faces the desk like the room's chairs). Anchor = the sprite's bottom-right corner on the chair's bottom-right point (+4,+4). Draw in order of increasing y.",
+  "professor": {
+    "x": 655,
+    "y": 615,
+    "anchor": "bottom-center",
+    "sprite": "prof",
+    "scale": 0.82
+  },
+  "chairs": {
+    "c1": [
+      842,
+      765
+    ],
+    "c2": [
+      1035,
+      718
+    ],
+    "c3": [
+      1240,
+      655
+    ],
+    "c4": [
+      1350,
+      600
+    ],
+    "c5": [
+      1085,
+      830
+    ],
+    "c6": [
+      1268,
+      770
+    ],
+    "c7": [
+      1438,
+      705
+    ]
+  },
+  "default_seating": {
+    "me": "c5",
+    "classmates": {
+      "brown": "c3",
+      "dark": "c1",
+      "blonde": "c6"
+    }
+  },
+  "characters": {
+    "brunette": {
+      "scene": "brunette_back",
+      "portrait": "brunette_front"
+    },
+    "brown": {
+      "scene": "brown_back",
+      "portrait": "brown_front"
+    },
+    "blonde": {
+      "scene": "blonde_back",
+      "portrait": "blonde_front"
+    },
+    "dark": {
+      "scene": "dark_back",
+      "portrait": "dark_front"
+    },
+    "prof": {
+      "scene": "prof",
+      "portrait": "prof"
+    }
+  },
+  "icons": {
+    "hand": "hand_icon",
+    "cold_call": "alert_icon",
+    "hand_icon_scale": 0.5,
+    "hand_icon_position": "above head, 35% from sprite left"
+  },
+  "speaking": "4 px yellow (#F2C14E) outline around the sprite",
+  "me": {
+    "character": "brunette",
+    "label": "You",
+    "tag_color": "#F47C7C"
+  }
+}

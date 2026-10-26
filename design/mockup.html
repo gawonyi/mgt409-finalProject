@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hand Up! — Classroom mockup v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E6F4FB;        /* light sky page */
+  --surface:#FFFDF7;   /* cream panels */
+  --line:#C9DCE8;      /* soft borders */
+  --ink:#1F2D45;       /* text */
+  --ink-2:#5B6B82;     /* secondary text */
+  --primary:#2F86AB;   /* muted teal: main actions */
+  --speaking:#F2C14E;  /* mustard: speaker outline, professor */
+  --me:#F47C7C;        /* coral: me */
+  --ok:#6DBE8C;        /* sage: hand raised */
+  --warn:#E8A13A;
+  --radius:6px;
+  --shadow:0 4px 12px rgba(31,45,69,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-size:15px}
+.app{max-width:1200px;margin:0 auto;padding:24px 16px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.logo{font-family:"Pixelify Sans",monospace;font-weight:600;font-size:24px;display:flex;align-items:center;gap:8px}
+.chip{font-size:13px;font-weight:500;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-2)}
+.chip b{color:var(--ink)}
+.spacer{flex:1}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.stage{overflow:hidden}
+.scene{position:relative;aspect-ratio:16/9;background:#D7EDF8;border-bottom:2px solid var(--line)}
+.scene svg{position:absolute;inset:0;width:100%;height:100%;shape-rendering:crispEdges}
+.actor .body{animation:bob 1.6s steps(2) infinite;transform-box:fill-box}
+.actor.a2 .body{animation-delay:.4s}.actor.a3 .body{animation-delay:.8s}
+@keyframes bob{50%{transform:translateY(-2px)}}
+.actor .f-up{display:none}.actor.raised .f-up{display:inline}.actor.raised .f-down{display:none}
+.actor.speaking .body{filter:drop-shadow(3px 0 0 var(--speaking)) drop-shadow(-3px 0 0 var(--speaking)) drop-shadow(0 3px 0 var(--speaking)) drop-shadow(0 -3px 0 var(--speaking))}
+.tag{font-family:"Pixelify Sans",monospace;font-size:12px}
+.status{position:absolute;left:16px;top:14px;display:flex;gap:8px}
+.pill{font-size:12px;font-weight:600;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px 10px}
+.pill.turn{background:var(--me);border-color:var(--me);color:#fff}
+/* RPG dialogue box */
+.dialog{display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:center;padding:14px 18px;min-height:112px;border-top:4px solid var(--speaking);background:var(--surface)}
+.dialog.me{border-top-color:var(--me);background:#FFF5F4}
+.face{width:72px;height:72px;border:2px solid var(--line);border-radius:var(--radius);background:#EAF5FB;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.who{font-family:"Pixelify Sans",monospace;font-weight:600;font-size:15px;margin-bottom:4px;display:flex;gap:8px;align-items:center}
+.who .role{font-family:Inter,sans-serif;font-weight:500;font-size:12px;color:var(--ink-2)}
+.say{font-size:16px;line-height:1.5}
+.say .caret{display:inline-block;width:8px;height:16px;background:var(--ink);vertical-align:-2px;animation:blink .8s steps(2) infinite;margin-left:2px}
+.next{font-size:12px;color:var(--ink-2);white-space:nowrap}
+.mic{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--me)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--me);animation:blink .8s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+/* controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 18px;border-top:2px solid var(--line)}
+.btn{font-family:Inter,sans-serif;font-weight:600;font-size:14px;padding:11px 18px;border-radius:var(--radius);border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.hand{background:var(--me);border-color:var(--me);color:#fff;font-family:"Pixelify Sans",monospace;font-size:17px;padding:11px 22px}
+.btn.hand.on{background:var(--ok);border-color:var(--ok)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.hint{font-size:12px;color:var(--ink-2)}
+.meter{margin-left:auto;font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+.bar{width:110px;height:8px;border-radius:4px;background:#E3EDF3;overflow:hidden}.bar i{display:block;height:100%;background:var(--primary)}
+/* history drawer */
+.history{width:300px}
+.history.closed{width:auto}
+.history h3{margin:0;padding:12px 14px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--line);cursor:pointer}
+.history.closed .log{display:none}
+.history.closed h3{border-bottom:0;writing-mode:vertical-rl;padding:14px 10px}
+.log{padding:10px 12px;display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto}
+.entry{font-size:13px;line-height:1.45;padding:8px 10px;border-radius:var(--radius);background:#F4F9FC}
+.entry b{font-family:"Pixelify Sans",monospace;font-weight:600;font-size:12px;display:block;color:var(--ink-2)}
+.entry.prof{border-left:4px solid var(--speaking)}.entry.me{border-left:4px solid var(--me)}
+@media (max-width:900px){.layout{grid-template-columns:1fr}.history{width:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="logo">✋ Hand Up!</div>
+    <span class="chip"><b>MGT 411</b> · Prof. Shin</span>
+    <span class="chip">Session 1 · 5C-STP-4P</span>
+    <div class="spacer"></div>
+    <span class="chip">Turn <b>4</b> / 14</span>
+  </div>
+
+  <div class="layout">
+    <div class="card stage">
+      <div class="scene" id="scene">
+        <svg id="room" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="status"><span class="pill turn">★ Your turn</span><span class="pill">✋ 2 hands up</span></div>
+      </div>
+
+      <!-- RPG dialogue box: professor speaking -->
+      <div class="dialog" id="dlgProf">
+        <div class="face" id="faceProf"></div>
+        <div>
+          <div class="who">Prof. Shin <span class="role">calls on you</span></div>
+          <div class="say">Gawon, you had your hand up. Which of the 5Cs tells us this is a bad idea?<span class="caret"></span></div>
+        </div>
+        <div class="next">click ▸ skip</div>
+      </div>
+      <!-- RPG dialogue box: my turn (shown after the professor finishes) -->
+      <div class="dialog me" id="dlgMe">
+        <div class="face" id="faceMe"></div>
+        <div>
+          <div class="who">You <span class="mic"><span class="dot"></span>Listening…</span></div>
+          <div class="say">I think it's the Customers piece. Gucci's target segment pays for exclusivity, so a $19.99 sweater<span class="caret"></span></div>
+        </div>
+        <div style="display:flex;gap:8px"><button class="btn">Re-record</button><button class="btn primary">Send ▸</button></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn hand on" id="hand">✋ Hand Up!</button>
+        <button class="btn">Pass</button>
+        <button class="btn">End class</button>
+        <span class="hint">Space = raise hand · ⌨ type instead</span>
+        <div class="meter">$0.07 / $0.50 <span class="bar"><i style="width:14%"></i></span> · Agent trace ▸</div>
+      </div>
+    </div>
+
+    <div class="card history" id="history">
+      <h3 id="histToggle">History <span>◂</span></h3>
+      <div class="log">
+        <div class="entry prof"><b>PROF. SHIN</b>What if Gucci sold sweaters for $19.99? What breaks?</div>
+        <div class="entry"><b>SKEPTIC</b>The price contradicts the positioning. The 4Ps stop being consistent.</div>
+        <div class="entry"><b>CONSULTANT</b>Building on that, the target segment would not recognize the brand anymore.</div>
+        <div class="entry prof"><b>PROF. SHIN → YOU</b>Gawon, which of the 5Cs tells us this is a bad idea?</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Placeholder scene drawn in code. In the app, room.png / desk.png / characters.png replace these shapes. */
+const NS='http://www.w3.org/2000/svg', svg=document.getElementById('room'), NAVY='#2B3A55';
+const OX=400, OY=135, TW=50, TH=25, GX=7, GY=6, WH=125;
+const iso=(x,y,z=0)=>[OX+(x-y)*TW, OY+(x+y)*TH-z];
+const P=a=>a.map(p=>p.join(',')).join(' ');
+function el(t,a,p=svg){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;}
+const poly=(pts,fill,p=svg,sw=2.5,stroke=NAVY)=>el('polygon',{points:P(pts),fill,stroke,'stroke-width':sw,'stroke-linejoin':'round'},p);
+const line=(a,b,p=svg,sw=2.5,stroke=NAVY)=>el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke,'stroke-width':sw},p);
+const rect=(x,y,w,h,fill,p)=>el('rect',{x,y,width:w,height:h,fill},p);
+// room
+poly([iso(0,0),iso(0,GY),iso(0,GY,WH),iso(0,0,WH)],'#6FB3CD');
+poly([iso(0,0),iso(GX,0),iso(GX,0,WH),iso(0,0,WH)],'#5AA0BC');
+poly([iso(0,GY),iso(GX,GY),iso(GX,GY,-14),iso(0,GY,-14)],'#E9D6A6');
+poly([iso(GX,0),iso(GX,GY),iso(GX,GY,-14),iso(GX,0,-14)],'#D9C08A');
+for(let x=0;x<GX;x++)for(let y=0;y<GY;y++)poly([iso(x,y),iso(x+1,y),iso(x+1,y+1),iso(x,y+1)],(x+y)%2?'#F6E7B0':'#FFF6E0',svg,1,'#E8D7A4');
+poly([iso(0,0),iso(GX,0),iso(GX,GY),iso(0,GY)],'none');
+function wallText(t,x,y,z,s,k,f='#EFFFF8'){const [a,b]=iso(x,y,z);el('text',{x:0,y:0,fill:f,'font-family':'Pixelify Sans, monospace','font-size':s,transform:`translate(${a},${b}) skewY(${k})`},svg).textContent=t;}
+poly([iso(0.7,0,40),iso(4.3,0,40),iso(4.3,0,108),iso(0.7,0,108)],'#3E7466',svg,5,'#D9945A');
+
+poly([iso(0,0.7,40),iso(0,3.3,40),iso(0,3.3,108),iso(0,0.7,108)],'#3E7466',svg,5,'#D9945A');
+
+const [cx,cy]=iso(5.3,0,96);el('circle',{cx,cy,r:11,fill:'#fff',stroke:NAVY,'stroke-width':2.5});
+const items=[];
+function desk(x,y){const g=el('g',{}),w=1,d=.62,h=28,t=6;
+  [[x+.08,y+.06],[x+w-.08,y+.06],[x+.08,y+d-.06],[x+w-.08,y+d-.06]].forEach(([a,b])=>line(iso(a,b,0),iso(a,b,h-t),g,3.5));
+  poly([iso(x,y+d,h-t),iso(x+w,y+d,h-t),iso(x+w,y+d,h),iso(x,y+d,h)],'#C9874E',g);
+  poly([iso(x+w,y,h-t),iso(x+w,y+d,h-t),iso(x+w,y+d,h),iso(x+w,y,h)],'#B9773F',g);
+  poly([iso(x,y,h),iso(x+w,y,h),iso(x+w,y+d,h),iso(x,y+d,h)],'#E9A066',g);}
+const SPR=["...HHHHHH...","..HHHHHHHH..",".HHHHHHHHHH.",".HHSSSSSSHH.",".HSSSSSSSSH.",".SSEESSEESS.",".SSEESSEESS.",".SPSSSSSSPS.","..SSSMMSSS..","...SSSSSS...","...CCTTCC...","..CCCTTCCC..",".ACCCTTCCCA.",".ACCCCCCCCA.",".S.CCCCCC.S."];
+function frame(c,up){const g=SPR.map(r=>[...r]);if(!c.tie)for(let y=10;y<=12;y++)for(let x=5;x<=6;x++)g[y][x]='C';
+  if(up){g[12][10]='C';g[13][10]='C';g[14][10]='.';for(let y=6;y<=11;y++)g[y][11]='A';g[4][11]='S';g[5][11]='S';g[12][11]='.';g[13][11]='.';}return g;}
+const COL=c=>({H:c.hair,S:'#FFD9B8',E:NAVY,P:'#F7A9A9',M:NAVY,C:c.shirt,A:c.shirt,T:'#D94F4F'});
+function grid(g,c,px,p){const H=g.length,W=g[0].length,f=(x,y)=>y>=0&&y<H&&x>=0&&x<W&&g[y][x]!=='.';
+  for(let y=-1;y<=H;y++)for(let x=-1;x<=W;x++){if(f(x,y))continue;if(f(x+1,y)||f(x-1,y)||f(x,y+1)||f(x,y-1))rect((x+1)*px,(y+1)*px,px,px,NAVY,p);}
+  g.forEach((r,y)=>r.forEach((ch,x)=>{if(ch!=='.')rect((x+1)*px,(y+1)*px,px,px,COL(c)[ch],p);}));}
+function spriteSVG(c,up,px){const W=14*px,H=17*px;const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);s.style.shapeRendering='crispEdges';grid(frame(c,up),c,px,s);return s;}
+function actor(c,x,y,cls,lift){const px=4,W=14*px,H=17*px,[sx,sy]=iso(x,y,0);
+  const g=el('g',{class:'actor '+cls,transform:`translate(${sx-W/2},${sy-H-lift})`});const b=el('g',{class:'body'},g);
+  grid(frame(c,false),c,px,el('g',{class:'f-down'},b));grid(frame(c,true),c,px,el('g',{class:'f-up'},b));
+  const tw=c.label.length*7+14,t=el('g',{},g);
+  el('rect',{x:W/2-tw/2,y:H+2,width:tw,height:17,rx:3,fill:c.tag||'#FFFDF7',stroke:'#C9DCE8','stroke-width':2},t);
+  el('text',{x:W/2,y:H+15,'text-anchor':'middle',class:'tag',fill:c.tagText||NAVY},t).textContent=c.label;}
+const PROF={label:'Prof. Shin',shirt:'#3F5BA9',hair:'#8A8680',tie:true,tag:'#F2C14E'};
+const ME={label:'You',shirt:'#F47C7C',hair:'#2A2235',tag:'#F47C7C',tagText:'#fff'};
+const seats=[
+  {dx:1.0,dy:2.3,who:{label:'Skeptic',shirt:'#7CC6FE',hair:'#3B2A20'},cls:'a1 raised'},
+  {dx:2.6,dy:2.3},
+  {dx:4.2,dy:2.3,who:{label:'Consultant',shirt:'#B9A5FF',hair:'#E0A23A'},cls:'a2'},
+  {dx:1.0,dy:4.1},
+  {dx:2.6,dy:4.1,who:ME,cls:'a3 me raised'},
+  {dx:4.2,dy:4.1}];
+seats.forEach(s=>{if(s.who)items.push({d:s.dx+s.dy+.4,f:()=>actor(s.who,s.dx+.5,s.dy-.05,s.cls,14)});items.push({d:s.dx+s.dy+.9,f:()=>desk(s.dx,s.dy)});});
+items.push({d:6.3,f:()=>actor(PROF,5.0,1.0,'prof speaking',0)});
+items.push({d:7.9,f:()=>desk(5.3,1.5)});
+items.push({d:6.9,f:()=>{const g=el('g',{}),x=6.05,y=.15,w=.75,d=.6,h=88;
+  poly([iso(x,y+d,0),iso(x+w,y+d,0),iso(x+w,y+d,h),iso(x,y+d,h)],'#E07A9B',g);poly([iso(x+w,y,0),iso(x+w,y+d,0),iso(x+w,y+d,h),iso(x+w,y,h)],'#C9638A',g);
+  poly([iso(x,y,h),iso(x+w,y,h),iso(x+w,y+d,h),iso(x,y+d,h)],'#F29BB6',g);poly([iso(x+.1,y+d,48),iso(x+w-.1,y+d,48),iso(x+w-.1,y+d,78),iso(x+.1,y+d,78)],'#8FDCC6',g,2);}});
+items.sort((a,b)=>a.d-b.d).forEach(i=>i.f());
+// portraits in dialogue boxes (cropped from the same sprite)
+document.getElementById('faceProf').appendChild(spriteSVG(PROF,false,5));
+document.getElementById('faceMe').appendChild(spriteSVG(ME,false,5));
+document.querySelectorAll('.face svg').forEach(s=>{s.style.transform='translateY(16px)';});
+// toggles
+document.getElementById('hand').onclick=e=>{document.querySelector('.actor.me').classList.toggle('raised');e.currentTarget.classList.toggle('on');};
+document.getElementById('histToggle').onclick=()=>document.getElementById('history').classList.toggle('closed');
+</script>
+</body>
+</html>

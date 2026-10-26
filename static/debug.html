@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hand Up! debug</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 16px; background: #E6F4FB; color: #1F2D45; }
+  section { background: #FFFDF7; border: 2px solid #C9DCE8; border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  button { padding: 6px 12px; border-radius: 6px; border: 2px solid #C9DCE8; background: #fff; cursor: pointer; }
+  button.primary { background: #2F86AB; color: #fff; border-color: #2F86AB; }
+  button.me { background: #F47C7C; color: #fff; border-color: #F47C7C; }
+  button.on { background: #6DBE8C; color: #fff; border-color: #6DBE8C; }
+  button:disabled { opacity: .45; cursor: default; }
+  #lines div { padding: 4px 8px; border-left: 4px solid #C9DCE8; margin: 4px 0; }
+  #lines .prof { border-color: #F2C14E; } #lines .me { border-color: #F47C7C; }
+  #trace { font: 12px/1.4 ui-monospace, monospace; max-height: 260px; overflow: auto; white-space: pre-wrap; }
+  .pill { padding: 2px 8px; border-radius: 999px; background: #C9DCE8; }
+  .flag { background: #F2C14E; }
+  textarea { width: 100%; min-height: 60px; }
+  #err { color: #b3261e; }
+</style>
+</head>
+<body>
+<h2>Hand Up! — debug (typing mode)</h2>
+
+<section>
+  <div class="row">
+    <button id="demo">1. Load demo + Prepare session</button>
+    <label><input type="checkbox" class="role" value="consultant" checked> Consultant</label>
+    <label><input type="checkbox" class="role" value="skeptic" checked> Skeptic</label>
+    <label><input type="checkbox" class="role" value="practitioner"> Practitioner</label>
+    <label><input type="checkbox" class="role" value="quant"> Quant</label>
+    <button id="start" class="primary" disabled>2. Start class</button>
+  </div>
+  <div id="prep"></div>
+  <div id="err"></div>
+</section>
+
+<section>
+  <div class="row">
+    <span class="pill" id="state">—</span>
+    <span class="pill" id="waiting">—</span>
+    <span class="pill" id="turn">turn 0</span>
+    <span class="pill" id="cost">$0</span>
+    <span id="flags"></span>
+    <span id="hands"></span>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button id="hand" class="me">Hand Up! (space)</button>
+    <button id="advance">Advance</button>
+    <label><input type="checkbox" id="auto" checked> auto-advance (hands window 3 s)</label>
+    <button id="end">End class</button>
+  </div>
+  <div id="lines"></div>
+  <div id="myturn" hidden>
+    <b>★ Your turn</b>
+    <textarea id="answer" placeholder="Type your answer…"></textarea>
+    <div class="row"><button id="send" class="primary">Send</button><button id="pass">Pass</button></div>
+  </div>
+  <div id="ending"></div>
+</section>
+
+<section><b>Agent trace</b><div id="trace"></div></section>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let course = null, packId = null, snap = null, timer = null, busy = false;
+
+async function api(path, body, form) {
+  const opt = body === undefined ? {} : form
+    ? { method: "POST", body }
+    : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+  const r = await fetch(path, opt);
+  const j = await r.json();
+  if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail));
+  return j;
+}
+
+$("demo").onclick = async () => {
+  $("err").textContent = ""; $("prep").textContent = "Preparing… (Integrity Gate → Pack Builder)";
+  try {
+    const d = await api("/api/demo");
+    course = d.course;
+    const fd = new FormData();
+    fd.append("course", JSON.stringify(course));
+    fd.append("questions", JSON.stringify(d.questions));
+    fd.append("use_demo", "true");
+    const p = await api("/api/prepare", fd, true);
+    packId = p.pack_id;
+    $("prep").innerHTML = p.gate.map(g => `Gate: ${g.label} → ${g.allowed ? "allowed" : "blocked"} (${g.reason})`).join("<br>")
+      + `<br>Pack ready: ${p.pack.frameworks.length} frameworks, ${p.pack.questions.length} questions, `
+      + `${p.pack.facts.length} facts, ${p.pack.takeaways.length} takeaways · $${p.spent_usd}`;
+    $("start").disabled = false;
+  } catch (e) { $("prep").textContent = ""; $("err").textContent = e.message; }
+};
+
+$("start").onclick = async () => {
+  const roles = [...document.querySelectorAll(".role:checked")].map(x => x.value).slice(0, 3);
+  $("start").disabled = true;
+  try { render(await api("/api/session", { pack_id: packId, roles })); }
+  catch (e) { $("err").textContent = e.message; }
+};
+
+async function act(action, extra = {}) {
+  if (!snap || busy) return;
+  busy = true; clearTimeout(timer);
+  try { render(await api(`/api/session/${snap.id}/act`, { action, ...extra })); }
+  catch (e) { $("err").textContent = e.message; }
+  finally { busy = false; }
+}
+
+function render(s) {
+  snap = s;
+  $("state").textContent = s.state; $("waiting").textContent = "waiting: " + s.waiting;
+  $("turn").textContent = `turn ${s.turn}/${s.turn_cap}`; $("cost").textContent = "$" + s.spent_usd.toFixed(4);
+  $("flags").innerHTML = Object.keys(s.flags).map(f => `<span class="pill flag">${f === "no_hands" ? "No hands, so…" : f}</span>`).join(" ")
+    + (s.skip_count ? ` <span class="pill">skipped ${s.skip_count}×</span>` : "");
+  $("hands").innerHTML = s.classmates.map(c => `<span class="pill">${c.name} (${c.role}) ${s.hands[c.id] ? "✋" : ""}</span>`).join(" ");
+  $("hand").className = s.my_hand ? "on" : "me";
+  $("hand").textContent = s.my_hand ? "Hand is up (space to lower)" : "Hand Up! (space)";
+  $("lines").innerHTML = s.lines.map(l => `<div class="${l.speaker}"><b>${l.name}</b> <small>${l.kind}</small>: ${esc(l.text)}`
+    + (l.cited_ids.length ? ` <small>[${l.cited_ids.join(", ")}]</small>` : "") + `</div>`).join("");
+  $("myturn").hidden = s.waiting !== "me";
+  $("trace").textContent = s.trace.slice().reverse().map(t => JSON.stringify(t)).join("\n");
+  $("ending").innerHTML = s.state === "BUDGET_ERROR_END"
+    ? `<b>Class ended (budget/error): ${esc(s.end_reason)}</b><br>Evaluation unavailable. Takeaways:<br>` + s.takeaways.map(t => `[${t.id}] ${esc(t.text)}`).join("<br>")
+    : s.state === "NORMAL_END" ? `<b>Class ended normally (${esc(s.end_reason)}).</b> Evaluation comes in step 6.` : "";
+  if ($("auto").checked) {
+    if (s.waiting === "audio") timer = setTimeout(() => act("advance"), 600);
+    if (s.waiting === "hands") timer = setTimeout(() => act("advance"), 3000);
+  }
+}
+const esc = (t) => String(t ?? "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+$("advance").onclick = () => act("advance");
+$("hand").onclick = () => act(snap?.my_hand ? "lower" : "raise");
+$("end").onclick = () => act("end");
+$("send").onclick = () => { const t = $("answer").value.trim(); if (t) { $("answer").value = ""; act("answer", { text: t }); } };
+$("pass").onclick = () => act("pass");
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space" && e.target.tagName !== "TEXTAREA") { e.preventDefault(); $("hand").click(); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hand Up!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="logo">✋ Hand Up!</div>
+    <span class="tagline">Raise your hand before the real class does.</span>
+    <span class="chip" id="chipCourse" hidden></span>
+    <span class="chip" id="chipSession" hidden></span>
+    <div class="spacer"></div>
+    <span class="chip" id="chipTurn" hidden></span>
+  </div>
+
+  <!-- ===================== Screen 1: Home ===================== -->
+  <main id="home">
+    <div class="home-grid">
+      <section class="card pad">
+        <div class="row between">
+          <h2>1 · Course</h2>
+          <button class="btn small" id="addCourse">+ Add course</button>
+        </div>
+        <div id="courseList" class="course-list"></div>
+        <button class="btn small ghost" id="editCourse">Edit course</button>
+      </section>
+
+      <section class="card pad">
+        <h2>2 · AI classmates <span class="sub">1–3</span></h2>
+        <div class="role-list" id="roleList"></div>
+      </section>
+
+      <section class="card pad wide">
+        <h2>3 · Session &amp; material</h2>
+        <label class="field">Session
+          <select id="sessionSel"></select>
+        </label>
+        <div class="field">Discussion questions <span class="sub">(from the schedule; edit if needed)</span>
+          <textarea id="questions" rows="3"></textarea>
+        </div>
+        <div class="row wrap">
+          <label class="field grow">Slides (PDF) <input type="file" id="slidesFile" accept=".pdf,.txt,.md"></label>
+          <label class="field grow">Case (PDF) <input type="file" id="caseFile" accept=".pdf,.txt,.md"></label>
+        </div>
+        <label class="field">My notes <textarea id="notes" rows="3" placeholder="Your own prep notes (always allowed)"></textarea></label>
+        <div class="policy-line" id="policyLine"></div>
+        <div class="row wrap">
+          <button class="btn primary" id="prepare">Prepare session</button>
+          <button class="btn" id="tryDemo">Try the demo</button>
+          <span id="prepStatus" class="status-text"></span>
+        </div>
+        <div id="gateOut" class="gate-out"></div>
+      </section>
+
+      <section class="card pad wide">
+        <h2>4 · Ready?</h2>
+        <div class="row wrap">
+          <div class="mic-check" id="micCheck">Checking…</div>
+          <button class="btn small" id="micBtn" type="button">Check mic</button>
+          <label class="check"><input type="checkbox" id="forceTyping"> Use typing instead of voice</label>
+        </div>
+        <div class="field">How confident do you feel about speaking in class? <span class="sub">1–10</span>
+          <div class="scale" id="confBefore"></div>
+        </div>
+        <details class="cuts">
+          <summary>Cost cuts <span class="sub">(on by default; switch off to compare cost and quality)</span></summary>
+          <div id="cutList" class="cut-list"></div>
+        </details>
+        <button class="btn primary big" id="startClass" disabled>Start class</button>
+        <p class="privacy">Privacy: Hand Up! does not record, store, or send audio to its own server; it keeps only the text.
+          The browser's speech service (e.g., Google in Chrome) may process audio. The mic is on only during your turn.</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- ===================== Screen 2: Classroom ===================== -->
+  <main id="classroom" hidden>
+    <div class="layout">
+      <div class="card stage">
+        <div class="scene" id="scene">
+          <div class="world" id="world"></div>
+          <div class="status">
+            <span class="pill turn" id="pillTurn" hidden>★ Your turn</span>
+            <span class="pill" id="pillHands" hidden></span>
+            <span class="pill flag" id="pillFlag" hidden></span>
+          </div>
+        </div>
+
+        <div class="dialog" id="dialog">
+          <div class="face"><img id="face" alt=""></div>
+          <div class="dialog-body">
+            <div class="who"><span id="whoName">—</span> <span class="role" id="whoRole"></span>
+              <span class="mic" id="listening" hidden><span class="dot"></span>Listening…</span></div>
+            <div class="say" id="say"></div>
+            <textarea id="myText" class="my-text" rows="2" placeholder="Type your answer… (Enter to send, Shift+Enter for a new line)" hidden></textarea>
+          </div>
+          <div class="dialog-side">
+            <span class="next" id="nextHint">click ▸ show all</span>
+            <div class="my-buttons" id="myButtons" hidden>
+              <button class="btn" id="rerecord" hidden>Re-record</button>
+              <button class="btn primary" id="send">Send ▸</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn hand" id="hand">✋ Hand Up!</button>
+          <button class="btn" id="pass" disabled>Pass</button>
+          <button class="btn" id="endClass">End class</button>
+          <button class="btn small" id="ttsBtn" title="Read lines aloud">🔊 Voice on</button>
+          <span class="hint" id="modeHint">Space = raise hand · ⌨ typing mode</span>
+          <div class="meter"><span id="costText">$0.00 / $0.50</span> <span class="bar"><i id="costBar"></i></span>
+            · <a href="#" id="costLink">Tokens &amp; cost ▸</a> · <a href="#" id="traceLink">Agent trace ▸</a></div>
+        </div>
+        <div class="end-card" id="endCard" hidden></div>
+      </div>
+
+      <div class="card history" id="history">
+        <h3 id="histToggle">History <span>◂</span></h3>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+
+    <div class="card side-panel" id="costPanel" hidden>
+      <div class="row between"><h3>Tokens &amp; cost</h3><button class="btn small" id="costClose">Close</button></div>
+      <div id="costBody"></div>
+    </div>
+
+    <div class="card side-panel" id="tracePanel" hidden>
+      <div class="row between"><h3>Agent trace</h3><button class="btn small" id="traceClose">Close</button></div>
+      <div id="traceBody" class="trace"></div>
+    </div>
+  </main>
+
+  <!-- ===================== Screen 3: Evaluation (step 6) ===================== -->
+  <main id="evaluation" class="eval" hidden></main>
+</div>
+
+<!-- Course Editor -->
+<dialog id="courseEditor" class="card">
+  <form method="dialog" id="courseForm">
+    <h2>Course</h2>
+    <label class="field">Course name <input name="name" required></label>
+    <label class="field">Professor name <input name="prof_name"></label>
+    <label class="field">Professor style <span class="sub">(free text: how they run discussion)</span>
+      <textarea name="style" rows="3"></textarea></label>
+    <label class="field">Signature moves <span class="sub">(optional)</span> <input name="signature_moves"></label>
+    <div class="sliders">
+      <label>Cold-call frequency <input type="range" name="cold_call" min="1" max="5"></label>
+      <label>Follow-up pressure <input type="range" name="follow_up_pressure" min="1" max="5"></label>
+      <label>Framework emphasis <input type="range" name="framework_emphasis" min="1" max="5"></label>
+      <label>Evidence demand <input type="range" name="evidence_demand" min="1" max="5"></label>
+      <label>Warmth <input type="range" name="warmth" min="1" max="5"></label>
+    </div>
+    <label class="field">Schedule <span class="sub">one session per block: first line = title, next lines = questions; blank line between sessions</span>
+      <textarea name="schedule" rows="6"></textarea></label>
+    <fieldset class="field">
+      <legend>Course AI policy</legend>
+      <label class="check"><input type="radio" name="policy" value="not_confirmed"> Not confirmed (default: case files blocked)</label>
+      <label class="check"><input type="radio" name="policy" value="allowed"> Allowed (source note required)</label>
+      <label class="check"><input type="radio" name="policy" value="not_allowed"> Not allowed (only my notes)</label>
+      <input name="source_note" placeholder="Source note, e.g. 'instructor, class 10/26; TA email'">
+      <p class="sub">The source note is your statement; Hand Up! cannot verify official approval.</p>
+    </fieldset>
+    <div class="row between">
+      <button class="btn" value="cancel" formnovalidate>Cancel</button>
+      <button class="btn primary" id="saveCourse" value="save">Save course</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="/static/scene.js"></script>
+<script src="/static/voice.js"></script>
+<script src="/static/app.js"></script>
+<script src="/static/evaluation.js"></script>
+</body>
+</html>
