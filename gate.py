@@ -88,6 +88,10 @@ def check_material(
     if kind == "notes":
         return GateResult(allowed=True, reason="Your own notes.")
 
+    if policy == "none":  # v1 UI has no policy setting: every uploaded file is used
+        _log({"event": "check", "kind": kind, "effective": kind, "policy": policy, "allowed": True})
+        return GateResult(allowed=True, reason=f"Loaded ({len(text or ''):,} characters).")
+
     # Treat slides that look like a case as a case.
     effective = "case" if kind == "case" or looks_like_case(text) else kind
 

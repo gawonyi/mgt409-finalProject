@@ -7,7 +7,7 @@ const ROLES = {
   practitioner: ["Carlos", "Practitioner", "Execution and real customers"],
   quant: ["Lena", "Quant", "Goes to the numbers"],
 };
-const ROLE_CHAR = ["brown", "dark", "blonde"];
+const ROLE_CHAR = { consultant: "blonde", skeptic: "brown", practitioner: "dark", quant: "ginger" };
 const CUTS = {
   shared_prefix: "Same prompt + pack prefix first (cache-friendly)",
   batched_hands: "One batched hand-raise call per turn",
@@ -48,7 +48,7 @@ function renderCourses() {
     <div class="course-card ${c.id === S.course?.id ? "sel" : ""}" data-id="${esc(c.id)}">
       <span class="ic">📚</span>
       <div><b>${esc(c.name)}</b> · ${esc(c.professor?.name || "")}
-        <small>${c.builtin ? "Sample course · " : ""}${(c.schedule || []).length} session(s)</small></div>
+        <small>${c.builtin ? "Sample course" : "My course"}</small></div>
     </div>`).join("");
   $("courseList").querySelectorAll(".course-card").forEach((el) =>
     (el.onclick = () => selectCourse(S.courses.find((c) => c.id === el.dataset.id))));
@@ -58,34 +58,23 @@ function selectCourse(c) {
   S.course = c;
   S.packId = null;
   renderCourses();
-  const sched = c?.schedule || [];
-  $("sessionSel").innerHTML = sched.map((s, i) => `<option value="${i}">${esc(s.title)}</option>`).join("")
-    || `<option value="">(no sessions — add one in Edit course)</option>`;
-  onSession();
-  const pol = c?.ai_policy || { state: "not_confirmed" };
-  const label = { not_confirmed: "Not confirmed — case files are blocked", allowed: "Allowed (your statement, not verified approval)", not_allowed: "Not allowed — only your notes are used" }[pol.state];
-  $("policyLine").innerHTML = `Course AI policy: <b>${label}</b>${pol.source_note ? ` · source: ${esc(pol.source_note)}` : ""}`;
-  updateStart();
+  resetPrep();
 }
 
-function currentSession() {
-  return (S.course?.schedule || [])[+$("sessionSel").value];
-}
-
-function onSession() {
-  const s = currentSession();
-  $("questions").value = (s?.questions || []).join("\n");
+function resetPrep() {
   S.packId = null;
+  S.demo = false;
   $("gateOut").innerHTML = "";
   $("prepStatus").textContent = "";
   updateStart();
 }
-$("sessionSel").onchange = onSession;
+$("questions").oninput = resetPrep;
+$("materialFiles").onchange = resetPrep;
 
 function renderRoles() {
   $("roleList").innerHTML = Object.entries(ROLES).map(([k, [name, role, desc]]) => {
     const i = S.roles.indexOf(k);
-    const ch = ROLE_CHAR[i >= 0 ? i : S.roles.length] || "brown";
+    const ch = ROLE_CHAR[k];
     return `<div class="role ${i >= 0 ? "sel" : ""}" data-k="${k}">
       <img src="/static/img/sprites/${ch}_front.png" alt="">
       <div><b>${name}</b> · ${role}<small>${desc}</small></div></div>`;
@@ -112,22 +101,18 @@ function updateStart() {
 }
 
 async function prepare({ notesOnly = false } = {}) {
-  const s = currentSession();
   const fd = new FormData();
   fd.append("course", JSON.stringify(S.course));
   fd.append("questions", JSON.stringify($("questions").value.split("\n").map((q) => q.trim()).filter(Boolean)));
   fd.append("notes", $("notes").value);
-  fd.append("use_demo", String(!!s?.case_file && !!S.course?.builtin));
-  if (!notesOnly) {
-    if ($("slidesFile").files[0]) fd.append("slides", $("slidesFile").files[0]);
-    if ($("caseFile").files[0]) fd.append("case", $("caseFile").files[0]);
-  }
+  fd.append("use_demo", String(!!S.demo));
+  if (!notesOnly) for (const f of $("materialFiles").files) fd.append("files", f);
   S.packId = null;
   updateStart();
   $("prepare").disabled = true;
   $("gateOut").innerHTML = "";
   $("prepStatus").className = "status-text";
-  $("prepStatus").textContent = "Checking course AI policy… building Session Pack (≈10 s)";
+  $("prepStatus").textContent = "Reading your material… building Session Pack (≈10 s)";
   try {
     const p = await api("/api/prepare", fd, true);
     S.packId = p.pack_id;
@@ -155,25 +140,23 @@ $("prepare").onclick = () => prepare();
 $("tryDemo").onclick = async () => {
   const demo = S.courses.find((c) => c.builtin) || S.courses[0];
   selectCourse(demo);
-  $("sessionSel").value = String(demo.schedule.findIndex((s) => s.case_file));
-  onSession();
+  const d = (demo.schedule || []).find((s) => s.case_file) || {};
+  $("questions").value = (d.questions || []).join("\n");
+  $("materialFiles").value = "";
+  S.demo = true;
   await prepare();
 };
 
 /* ---------- Course Editor ---------- */
 function openEditor(course) {
   const f = $("courseForm");
-  const c = course || { name: "", professor: { name: "", style: "", signature_moves: "", sliders: {} }, schedule: [], ai_policy: { state: "not_confirmed", source_note: "" } };
+  const c = course || { name: "", professor: { name: "", style: "", sliders: {} } };
   f.dataset.id = course && !course.builtin ? course.id : "";
   f.name.value = c.name + (course?.builtin ? " (my copy)" : "");
   f.prof_name.value = c.professor?.name || "";
   f.style.value = c.professor?.style || "";
-  f.signature_moves.value = c.professor?.signature_moves || "";
   for (const k of ["cold_call", "follow_up_pressure", "framework_emphasis", "evidence_demand", "warmth"])
     f[k].value = c.professor?.sliders?.[k] ?? 3;
-  f.schedule.value = (c.schedule || []).map((s) => [s.title, ...(s.questions || [])].join("\n")).join("\n\n");
-  f.querySelectorAll("[name=policy]").forEach((r) => (r.checked = r.value === (c.ai_policy?.state || "not_confirmed")));
-  f.source_note.value = c.ai_policy?.source_note || "";
   f._base = c;
   $("courseEditor").showModal();
 }
@@ -182,27 +165,15 @@ $("editCourse").onclick = () => openEditor(S.course);
 $("courseForm").onsubmit = async (e) => {
   const f = e.target;
   if (e.submitter?.value !== "save") return;
-  const policy = f.querySelector("[name=policy]:checked")?.value || "not_confirmed";
-  if (policy === "allowed" && !f.source_note.value.trim()) {
-    e.preventDefault();
-    alert("Policy 'Allowed' needs a source note (who said so, and where).");
-    return;
-  }
   const base = f._base || {};
-  const schedule = f.schedule.value.split(/\n\s*\n/).map((b) => b.split("\n").map((x) => x.trim()).filter(Boolean))
-    .filter((l) => l.length).map(([title, ...questions], i) => {
-      const old = (base.schedule || []).find((s) => s.title === title) || {};
-      return { ...old, session: old.session || `s${i + 1}`, title, questions };
-    });
   const course = {
     id: f.dataset.id || undefined,
     name: f.name.value.trim(),
     professor: {
-      name: f.prof_name.value.trim(), style: f.style.value.trim(), signature_moves: f.signature_moves.value.trim(),
+      name: f.prof_name.value.trim(), style: f.style.value.trim(),
       sliders: Object.fromEntries(["cold_call", "follow_up_pressure", "framework_emphasis", "evidence_demand", "warmth"].map((k) => [k, +f[k].value])),
     },
-    schedule,
-    ai_policy: { state: policy, source_note: f.source_note.value.trim() },
+    schedule: base.schedule || [],
   };
   const saved = await api("/api/courses", course);
   await loadCourses(saved.id);
@@ -220,7 +191,7 @@ $("startClass").onclick = async () => {
     $("classroom").hidden = false;
     $("chipCourse").hidden = $("chipSession").hidden = $("chipTurn").hidden = false;
     $("chipCourse").innerHTML = `<b>${esc(S.course.name)}</b> · ${esc(S.course.professor?.name || "")}`;
-    $("chipSession").textContent = currentSession()?.title || "Session";
+    $("chipSession").textContent = S.demo ? "Demo: Brightloaf Bakery" : "Practice session";
     await Scene.build($("scene"), {
       prof: { name: snap.prof_name },
       me: { name: "You", character: "brunette" },

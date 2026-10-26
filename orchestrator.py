@@ -42,7 +42,7 @@ PERSONAS = {
     "quant": "Quant: goes to the numbers in the exhibits and does quick math.",
 }
 NAMES = {"consultant": "Priya", "skeptic": "Ben", "practitioner": "Carlos", "quant": "Lena"}
-CHARACTERS = ["brown", "dark", "blonde"]  # scene sprites for classmates 1–3 (layout.json)
+CHARACTERS = {"consultant": "blonde", "skeptic": "brown", "practitioner": "dark", "quant": "ginger"}  # fixed sprite per role (layout.json)
 
 
 @dataclass
@@ -59,7 +59,7 @@ class Classmate:
 
 def make_classmates(roles: list[str]) -> list[Classmate]:
     roles = [r for r in roles if r in PERSONAS][:3] or ["consultant", "skeptic"]
-    return [Classmate(f"cm{i}", r, NAMES[r], CHARACTERS[i - 1]) for i, r in enumerate(roles, 1)]
+    return [Classmate(f"cm{i}", r, NAMES[r], CHARACTERS[r]) for i, r in enumerate(roles, 1)]
 
 
 def max_followups(pressure: int) -> int:

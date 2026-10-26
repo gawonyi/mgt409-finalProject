@@ -80,7 +80,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-u
 <div class="app">
   <div class="top">
     <div class="logo">✋ Hand Up!</div>
-    <span class="chip"><b>MGT 411</b> · Prof. Shin</span>
+    <span class="chip"><b>MGT 411</b> · Prof. S</span>
     <span class="chip">Session 1 · 5C-STP-4P</span>
     <div class="spacer"></div>
     <span class="chip">Turn <b>4</b> / 14</span>
@@ -97,7 +97,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-u
       <div class="dialog" id="dlgProf">
         <div class="face" id="faceProf"></div>
         <div>
-          <div class="who">Prof. Shin <span class="role">calls on you</span></div>
+          <div class="who">Prof. S <span class="role">calls on you</span></div>
           <div class="say">Gawon, you had your hand up. Which of the 5Cs tells us this is a bad idea?<span class="caret"></span></div>
         </div>
         <div class="next">click ▸ skip</div>
@@ -124,10 +124,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-u
     <div class="card history" id="history">
       <h3 id="histToggle">History <span>◂</span></h3>
       <div class="log">
-        <div class="entry prof"><b>PROF. SHIN</b>What if Gucci sold sweaters for $19.99? What breaks?</div>
+        <div class="entry prof"><b>PROF. S</b>What if Gucci sold sweaters for $19.99? What breaks?</div>
         <div class="entry"><b>SKEPTIC</b>The price contradicts the positioning. The 4Ps stop being consistent.</div>
         <div class="entry"><b>CONSULTANT</b>Building on that, the target segment would not recognize the brand anymore.</div>
-        <div class="entry prof"><b>PROF. SHIN → YOU</b>Gawon, which of the 5Cs tells us this is a bad idea?</div>
+        <div class="entry prof"><b>PROF. S → YOU</b>Gawon, which of the 5Cs tells us this is a bad idea?</div>
       </div>
     </div>
   </div>
@@ -176,7 +176,7 @@ function actor(c,x,y,cls,lift){const px=4,W=14*px,H=17*px,[sx,sy]=iso(x,y,0);
   const tw=c.label.length*7+14,t=el('g',{},g);
   el('rect',{x:W/2-tw/2,y:H+2,width:tw,height:17,rx:3,fill:c.tag||'#FFFDF7',stroke:'#C9DCE8','stroke-width':2},t);
   el('text',{x:W/2,y:H+15,'text-anchor':'middle',class:'tag',fill:c.tagText||NAVY},t).textContent=c.label;}
-const PROF={label:'Prof. Shin',shirt:'#3F5BA9',hair:'#8A8680',tie:true,tag:'#F2C14E'};
+const PROF={label:'Prof. S',shirt:'#3F5BA9',hair:'#8A8680',tie:true,tag:'#F2C14E'};
 const ME={label:'You',shirt:'#F47C7C',hair:'#2A2235',tag:'#F47C7C',tagText:'#fff'};
 const seats=[
   {dx:1.0,dy:2.3,who:{label:'Skeptic',shirt:'#7CC6FE',hair:'#3B2A20'},cls:'a1 raised'},

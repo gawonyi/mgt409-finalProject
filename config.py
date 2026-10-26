@@ -20,11 +20,12 @@ PORTKEY_BASE_URL_DEFAULT = "https://api.portkey.ai/v1"
 MODEL = "gpt-6-luna"  # course key allows only this model
 
 # USD per 1M tokens. One place to change prices.
-# TODO(user): confirm gpt-6-luna prices; these are conservative placeholders.
+# Calibrated to the Portkey dashboard (Oct 26, 2026): a typical ~1.6K-token gpt-6-luna call
+# is billed about 0.02 cents (= $0.0002). These per-1M rates reproduce that.
 PRICES = {
-    "input": 1.25,
-    "cached_input": 0.125,
-    "output": 10.00,
+    "input": 0.15,
+    "cached_input": 0.015,
+    "output": 1.00,
 }
 
 # Budget (PRD §6 rule 9, §10)

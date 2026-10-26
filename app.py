@@ -107,12 +107,10 @@ async def prepare(
     questions: str = Form("[]"),
     notes: str = Form(""),
     use_demo: bool = Form(False),
-    slides: UploadFile | None = File(None),
-    case: UploadFile | None = File(None),
+    files: list[UploadFile] = File(default=[]),
 ):
     course_d = json.loads(course)
-    policy = course_d.get("ai_policy", {}).get("state", "not_confirmed")
-    source_note = course_d.get("ai_policy", {}).get("source_note", "")
+    policy, source_note = "none", ""  # v1: no course AI-policy setting; all uploads are used
     qs = [q for q in json.loads(questions) if q.strip()]
 
     materials: list[packmod.Material] = []
@@ -120,9 +118,9 @@ async def prepare(
         demo_mats, demo_qs = packmod.demo_materials()
         materials += demo_mats
         qs = qs or demo_qs
-    for f, kind in ((slides, "slides"), (case, "case")):
+    for f in files or []:
         if f is not None and f.filename:
-            materials.append(await _save_upload(f, kind))
+            materials.append(await _save_upload(f, "material"))
     if notes.strip():
         materials.append(packmod.Material("notes", "My notes", notes))
 

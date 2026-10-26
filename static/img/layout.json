@@ -55,7 +55,8 @@
     "classmates": {
       "brown": "c3",
       "dark": "c1",
-      "blonde": "c6"
+      "blonde": "c6",
+      "ginger": "c4"
     }
   },
   "characters": {
@@ -78,6 +79,10 @@
     "prof": {
       "scene": "prof",
       "portrait": "prof"
+    },
+    "ginger": {
+      "scene": "ginger_back",
+      "portrait": "ginger_front"
     }
   },
   "icons": {

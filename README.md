@@ -54,8 +54,8 @@ works.
 
 1. On Home, click **Try the demo**. This loads the fictional *Brightloaf Bakery* case
    (`samples/demo_case.md`, 2 pages + Exhibit 1), its 3 questions, and `samples/course_mgt411.json`.
-   The professor style there is a short default drawn from the syllabus's participation and case-prep
-   guidance; describe your own professor in **Edit course**.
+   The sample course is *MGT 000 Test · Prof. S*; its professor style is a short default drawn from
+   typical case-method guidance. Describe your own professor in **Edit course** (style + 5 sliders).
 2. Wait for "Pack ready" (≈10 s), tap your confidence (1–10), and click **Start class**.
 3. Press **Space** or **✋ Hand Up!** to raise your hand. Answer when it's your turn (speak, or type),
    or press **Pass**. **End class** ends at any time.
@@ -91,7 +91,7 @@ One live test runs the Pack Builder with injected text. It is skipped by default
 
 | Agent | Kind | Job | Output (Pydantic) |
 |---|---|---|---|
-| Integrity Gate | plain Python | applies the course AI policy **before** any uploaded text leaves the machine | `GateResult` |
+| Integrity Gate | plain Python | checks and logs every uploaded file **before** any text leaves the machine | `GateResult` |
 | Pack Builder | LLM | material → Session Pack with IDs (`F#`, `Q#`, facts like `S1-2a` with a source, `T#`) | `SessionPack` |
 | Orchestrator | plain Python | turn-taking state machine, eligibility, cold call, starvation, no-hands fallback, caps, budget, end types | — |
 | Professor | LLM | picks **only** from the eligible list; asks, follows up, rephrases, moves on, wraps up | `ProfMove` |
@@ -143,13 +143,11 @@ against the budget, so a session never exceeds **$0.50**.
 
 ## Safety and integrity
 
-- **Course AI policy** has three states. *Not confirmed* (the default) blocks case files.
-  *Allowed* needs a source note, which is the user's statement, not verified official approval.
-  *Not allowed* uses only your own notes. The gate is plain code and runs before anything is sent
-  to the model. A file uploaded as "slides" that looks like a teaching case is treated as a case.
-- **Bundled demo exception.** The fictional demo case passes only because its SHA-256 hash is in
-  `samples/allowlist.json` (`is_bundled_demo`). User uploads never get this exception, even if the
-  bytes are identical. Every bypass is logged to `logs/gate.jsonl`.
+- **Your materials.** Upload any number of files (case, slides, readings; PDF/TXT/MD). There is no
+  course-policy setting in v1: every uploaded file is sent to the model, so check your course's AI
+  rules before uploading a real case. The Integrity Gate (plain code) still runs first on every file
+  and logs it to `logs/gate.jsonl`; its policy states remain in `gate.py` and are covered by tests for
+  a future version.
 - **No graded work.** Write-up requests are refused in code and never sent to the model to be
   "polished".
 - **Prompt injection.** Materials and transcripts are wrapped in delimiters and treated as data,
@@ -182,7 +180,7 @@ scripts/check_model.py   tests/
 
 ## Known limits
 
-- The gpt-6-luna prices in `config.py` are placeholders. Update them for exact dollar figures.
+- Prices in `config.py` are calibrated to the Portkey dashboard (a typical ~1.6K-token call ≈ 0.02 cents), not an official price list.
 - Classmate remarks are capped at 50 words (the PRD allows 80) so a spoken turn takes about 15 s.
 - Speech recognition quality depends on the browser; the Coach ignores obvious recognition errors.
 - Comparison is with the previous session only. A running summary is out of scope for v1.

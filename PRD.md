@@ -12,8 +12,8 @@ v4.1 (second review): bundled demo allowlist, budget reservation + two end types
 
 | # | File (from `consumer/course_files_export (1)/`) | What it contains | How Hand Up! uses it |
 |---|---|---|---|
-| D1 | `L1-Introduction_class.pdf` (44 slides, Prof. Jiwoong Shin) | Marketing as creating/capturing value; **5C → STP → 4P**; strategy as an **integrated set of choices**; superior value proposition (differentiation vs cost leadership); **segmentation** (descriptor "who", behavioral "what", benefit "why"; sizable, identifiable, actionable); examples: Gucci/Hermès/Southwest "What if…", Dove, AT&T, McDonald's, Uber surge (slide 41), NYT paywall (slide 42); Takeaways (slide 44) | **Framework layer** of the Session Pack. **Discussion questions** for the Session 1 demo. Takeaways = where the wrap-up should land. |
-| D2 | `MGT 411 Customer- 2026 Syllabus 10.23.26.pdf` | Participation **20%** (attendance 10%, input 10%; "quality more important than quantity"; "cold-call should be expected"). **Case prep guidance**: read twice, root causes, case data for specific recommendations, pros and cons, no single right answer, explain theory and process, apply lecture frameworks. Schedule with **discussion questions per case**. AI policy text: "the case itself must never be uploaded, and you must not use AI to generate the substance of your assignment." | **Problem evidence.** **Evaluation rubric.** **Course schedule.** **Course AI policy** default (see §11). |
+| D1 | `L1-Introduction_class.pdf` (44 slides, Prof. S) | Marketing as creating/capturing value; **5C → STP → 4P**; strategy as an **integrated set of choices**; superior value proposition (differentiation vs cost leadership); **segmentation** (descriptor "who", behavioral "what", benefit "why"; sizable, identifiable, actionable); examples: Gucci/Hermès/Southwest "What if…", Dove, AT&T, McDonald's, Uber surge (slide 41), NYT paywall (slide 42); Takeaways (slide 44) | **Framework layer** of the Session Pack. **Discussion questions** for the Session 1 demo. Takeaways = where the wrap-up should land. |
+| D2 | `MGT 000 Test- 2026 Syllabus 10.23.26.pdf` | Participation **20%** (attendance 10%, input 10%; "quality more important than quantity"; "cold-call should be expected"). **Case prep guidance**: read twice, root causes, case data for specific recommendations, pros and cons, no single right answer, explain theory and process, apply lecture frameworks. Schedule with **discussion questions per case**. AI policy text: "the case itself must never be uploaded, and you must not use AI to generate the substance of your assignment." | **Problem evidence.** **Evaluation rubric.** **Course schedule.** **Course AI policy** default (see §11). |
 | D3 | `Session 1 Readings_FA26.pdf` (1 page) | Reading list: Dolan, "Framework for Marketing Strategy Formation" (HBP 8153) | Listed as the session reading; the note itself is not in the folder. |
 | D4 | User interview (2026-10-26) | Decisions below | Product decisions |
 | D5 | External review (2026-10-26) | Spec gaps: turn rules, voice limits, first-session evaluation, policy source, scope, experiment, scale costs | Incorporated in v4 |
@@ -57,7 +57,7 @@ Non-goals (v1): writing case write-ups, multi-user rooms, Canvas integration, pr
 ## 5. Screens and features
 
 ### Screen 1 — Home
-- **Course picker**: saved course cards (e.g., "MGT 411 Customer · Prof. Shin"). "+ Add course" → Course Editor.
+- **Course picker**: saved course cards (e.g., "MGT 000 Test · Prof. S"). "+ Add course" → Course Editor.
 - **Classmates**: 1–3 AI classmates (default 2) from Consultant, Skeptic, Practitioner, Quant.
 - **Discussion material**: pick a session (questions auto-filled from the schedule), attach slides PDF, case PDF (if the course policy allows), my notes.
 - **Prepare session** → Integrity Gate → Pack Builder runs **here**, with a progress state. On failure: clear error, retry, or continue with notes only. **Start class is enabled only when the Pack is ready.**
@@ -235,7 +235,7 @@ FastAPI + one static HTML/JS page; `python app.py` → `http://localhost:8000` (
 | Report + slides | 12 | after build |
 
 ## 17. Open items for the user
-- Prof. Shin style description (free text) and slider values.
+- Prof. S style description (free text) and slider values.
 
 ## 18. Flowcharts
 `flowchart_user.png` (user flow), `flowchart_turn.png` (turn-taking state machine), `flowchart_data.png` (files → features).

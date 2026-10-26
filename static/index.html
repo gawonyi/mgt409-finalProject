@@ -37,19 +37,13 @@
       </section>
 
       <section class="card pad wide">
-        <h2>3 · Session &amp; material</h2>
-        <label class="field">Session
-          <select id="sessionSel"></select>
-        </label>
-        <div class="field">Discussion questions <span class="sub">(from the schedule; edit if needed)</span>
-          <textarea id="questions" rows="3"></textarea>
+        <h2>3 · Discussion material</h2>
+        <div class="field">Discussion questions
+          <textarea id="questions" rows="3" placeholder="One question per line"></textarea>
         </div>
-        <div class="row wrap">
-          <label class="field grow">Slides (PDF) <input type="file" id="slidesFile" accept=".pdf,.txt,.md"></label>
-          <label class="field grow">Case (PDF) <input type="file" id="caseFile" accept=".pdf,.txt,.md"></label>
-        </div>
-        <label class="field">My notes <textarea id="notes" rows="3" placeholder="Your own prep notes (always allowed)"></textarea></label>
-        <div class="policy-line" id="policyLine"></div>
+        <label class="field">Materials <span class="sub">(case, slides, readings · PDF / TXT / MD · several files OK)</span>
+          <input type="file" id="materialFiles" accept=".pdf,.txt,.md" multiple></label>
+        <label class="field">My notes <textarea id="notes" rows="3" placeholder="Your own prep notes (optional)"></textarea></label>
         <div class="row wrap">
           <button class="btn primary" id="prepare">Prepare session</button>
           <button class="btn" id="tryDemo">Try the demo</button>
@@ -151,7 +145,6 @@
     <label class="field">Professor name <input name="prof_name"></label>
     <label class="field">Professor style <span class="sub">(free text: how they run discussion)</span>
       <textarea name="style" rows="3"></textarea></label>
-    <label class="field">Signature moves <span class="sub">(optional)</span> <input name="signature_moves"></label>
     <div class="sliders">
       <label>Cold-call frequency <input type="range" name="cold_call" min="1" max="5"></label>
       <label>Follow-up pressure <input type="range" name="follow_up_pressure" min="1" max="5"></label>
@@ -159,16 +152,6 @@
       <label>Evidence demand <input type="range" name="evidence_demand" min="1" max="5"></label>
       <label>Warmth <input type="range" name="warmth" min="1" max="5"></label>
     </div>
-    <label class="field">Schedule <span class="sub">one session per block: first line = title, next lines = questions; blank line between sessions</span>
-      <textarea name="schedule" rows="6"></textarea></label>
-    <fieldset class="field">
-      <legend>Course AI policy</legend>
-      <label class="check"><input type="radio" name="policy" value="not_confirmed"> Not confirmed (default: case files blocked)</label>
-      <label class="check"><input type="radio" name="policy" value="allowed"> Allowed (source note required)</label>
-      <label class="check"><input type="radio" name="policy" value="not_allowed"> Not allowed (only my notes)</label>
-      <input name="source_note" placeholder="Source note, e.g. 'instructor, class 10/26; TA email'">
-      <p class="sub">The source note is your statement; Hand Up! cannot verify official approval.</p>
-    </fieldset>
     <div class="row between">
       <button class="btn" value="cancel" formnovalidate>Cancel</button>
       <button class="btn primary" id="saveCourse" value="save">Save course</button>
