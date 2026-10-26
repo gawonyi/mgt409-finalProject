@@ -315,11 +315,16 @@ function playLine(snap, line) {
   const tts = Voice.enabled();
   const step = tts ? Math.max(1, Math.round(text.length / (Voice.estimateMs(text, character) / 30))) : 3;
   return new Promise((resolve) => {
-    let i = 0, done = false, typedAll = false, spoken = !tts;
+    let i = 0, done = false, typedAll = false, spoken = !tts, hold = null;
+    // script only: a reading pause after the line is typed; a click shows all, a second click moves on
     const finish = () => {
-      if (!done && typedAll && spoken) { done = true; setTimeout(resolve, tts ? 250 : 700 + words * 25); }
+      if (!done && typedAll && spoken) { done = true; hold = setTimeout(resolve, tts ? 250 : 1000 + words * 50); }
     };
-    const showAll = () => { i = text.length; $("say").textContent = text; typedAll = true; clearInterval(timer); finish(); };
+    const showAll = () => {
+      if (done && hold && !tts) { clearTimeout(hold); resolve(); return; }
+      i = text.length; $("say").textContent = text; typedAll = true; clearInterval(timer); finish();
+      $("nextHint").textContent = tts ? "" : "click ▸ next";
+    };
     const timer = setInterval(() => {
       i += step;
       $("say").innerHTML = esc(text.slice(0, i)) + '<span class="caret"></span>';
@@ -402,11 +407,15 @@ Voice.onFallback((reason) => {
   $("myText").focus();
 });
 
-$("ttsBtn").onclick = () => {
-  const on = !Voice.enabled();
+function setTTS(on) {
   Voice.setTTS(on);
-  $("ttsBtn").textContent = on ? "🔊 Voice on" : "🔇 Voice off";
-};
+  $("ttsBtn").textContent = Voice.enabled() ? "🔊 Voice on" : "🔇 Voice off";
+  $("readAloud").checked = Voice.enabled();
+}
+$("ttsBtn").onclick = () => setTTS(!Voice.enabled());
+$("readAloud").onchange = () => setTTS($("readAloud").checked);
+if (!Voice.hasTTS) { $("ttsBtn").hidden = true; $("readAloud").disabled = true; }
+setTTS(Voice.enabled()); // default off; remembers the viewer's last choice
 
 async function checkMic(ask) {
   const forced = $("forceTyping").checked;

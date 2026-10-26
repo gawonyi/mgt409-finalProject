@@ -24,7 +24,7 @@
     root.innerHTML = render(v, snap);
     bindHome();
     root.querySelectorAll("[data-play]").forEach((b) =>
-      (b.onclick = () => Voice.speakText(b.dataset.play, "brunette")));
+      (b.onclick = () => Voice.speakText(b.dataset.play, "brunette", { force: true })));
     renderConfidence("confAfter", async (n) => {
       const r = await api(`/api/session/${snap.id}/confidence`, { after: n });
       $("confTrend").innerHTML = trend(r.history);

@@ -44,6 +44,12 @@ Then open **http://localhost:8000**.
 class and the evaluation work without a microphone. If speech recognition is unavailable or fails,
 Hand Up! switches to typing automatically and shows why.
 
+**Voice output is off by default.** The point is practicing *your* speaking, so the professor's and
+classmates' lines appear as a typed script. Turn on **🔊 Read professor & classmate lines aloud**
+on Home, or the 🔊 button in class, to hear them in the browser's natural voices (e.g. Daniel,
+Samantha, Karen, Moira on macOS; Google voices in Chrome). The ▶ Play button on polished lines always
+works.
+
 ## Try the demo
 
 1. On Home, click **Try the demo**. This loads the fictional *Brightloaf Bakery* case
@@ -98,8 +104,9 @@ sent.
 
 **Turn states:**
 `PROF_SPEAKING → HANDS_OPEN → SELECTING → SPEAKER_TURN → AFTER_ANSWER → (FOLLOW_UP | PROF_SPEAKING | NORMAL_END | BUDGET_ERROR_END)`.
-The next step starts on the TTS end, error, or cancel event, or a safety timeout (estimated
-duration + 3 s). In typing mode it starts right after the line is shown.
+With voice output on, the next step starts on the TTS end, error, or cancel event, or a safety
+timeout (estimated duration + 3 s). With it off, the next step starts after a short reading pause,
+or right away when you click the dialogue box.
 
 - **Cold call** applies to you only. Its probability comes from the professor's slider, and it never
   happens twice in a row.

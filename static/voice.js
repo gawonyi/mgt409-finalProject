@@ -1,35 +1,60 @@
 /* Voice layer (browser only, no paid audio API).
-   TTS: speechSynthesis, one voice/pitch/rate per character. speak() resolves on the utterance
-   end, error OR cancel, or a safety timeout (estimated duration + 3 s), so voices never overlap
-   and the class never freezes.
+   TTS: speechSynthesis, one natural voice + rate per character. It is OFF by default (the student's
+   own voice is the point; AI lines show as a typed script) and can be switched on in Home or class.
+   speakText() resolves on the utterance end, error OR cancel, or a safety timeout (estimated
+   duration + 3 s), so voices never overlap and the class never freezes.
    STT: Web Speech API SpeechRecognition, on only during my turn. Any recognition error or a
    missing API switches to typing mode with a short reason (full parity).
    Hand Up! never records or uploads audio; the browser's speech service may process it. */
 const Voice = (() => {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const synth = window.speechSynthesis;
-  const PROFILE = { // pitch, rate, preferred voice index among English voices
-    prof: { pitch: 0.85, rate: 0.98, pick: 0 },
-    brown: { pitch: 1.05, rate: 1.05, pick: 1 },
-    dark: { pitch: 0.75, rate: 1.0, pick: 2 },
-    blonde: { pitch: 1.25, rate: 1.08, pick: 3 },
-    brunette: { pitch: 1.1, rate: 1.0, pick: 4 },
+  // preferred natural voices per character (macOS, Chrome/Google, Windows/Edge names); pitch stays 1
+  const PROFILE = {
+    prof: { rate: 0.97, prefer: ["Daniel", "Google UK English Male", "Microsoft Guy", "Rishi", "Arthur", "Aaron"] },
+    brown: { rate: 1.03, prefer: ["Samantha", "Google US English", "Microsoft Aria", "Ava", "Allison"] },
+    dark: { rate: 1.0, prefer: ["Karen", "Google UK English Female", "Microsoft Jenny", "Serena", "Kate"] },
+    blonde: { rate: 1.05, prefer: ["Moira", "Tessa", "Microsoft Sonia", "Fiona", "Zoe"] },
+    brunette: { rate: 1.0, prefer: ["Samantha", "Google US English", "Microsoft Aria", "Ava"] },
   };
+  // novelty / robotic macOS voices are never picked
+  const NOVELTY = /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Ralph|Kathy|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley)\b/i;
+  const TTS_KEY = "handup.tts";
+  let savedTTS = false;
+  try { savedTTS = localStorage.getItem(TTS_KEY) === "on"; } catch { /* storage blocked: default off */ }
   const st = {
-    tts: !!synth, listen: !!SR, reason: SR ? "" : "This browser has no speech recognition (use Chrome for voice).",
+    tts: !!synth && savedTTS, listen: !!SR, reason: SR ? "" : "This browser has no speech recognition (use Chrome for voice).",
     rec: null, active: false, finalText: "", t0: null, t1: null, rerecords: 0, onFallback: null,
   };
+  const chosen = {}; // character → voice, so each character keeps one voice
 
-  function englishVoices() {
-    const v = synth ? synth.getVoices().filter((x) => /^en(-|_|$)/i.test(x.lang)) : [];
-    return v.length ? v : synth ? synth.getVoices() : [];
+  function naturalVoices() {
+    const all = synth ? synth.getVoices() : [];
+    const en = all.filter((x) => /^en(-|_|$)/i.test(x.lang) && !NOVELTY.test(x.name));
+    return en.length ? en : all.filter((x) => !NOVELTY.test(x.name));
   }
-  if (synth) synth.onvoiceschanged = () => englishVoices();
+  if (synth) synth.onvoiceschanged = () => { for (const k in chosen) delete chosen[k]; };
+
+  function voiceFor(character) {
+    if (chosen[character] !== undefined) return chosen[character];
+    const vs = naturalVoices();
+    // class speakers get distinct voices; "brunette" (me, only for ▶ Play) may share one
+    const taken = character === "brunette" ? new Set()
+      : new Set(Object.entries(chosen).filter(([k, v]) => v && k !== "brunette").map(([, v]) => v.name));
+    const byName = (n) => vs.find((v) => v.name === n || v.name.startsWith(n + " ") || v.name.startsWith(n + " ("));
+    const p = PROFILE[character] || PROFILE.prof;
+    let v = p.prefer.map(byName).find((x) => x && !taken.has(x.name))
+      || vs.find((x) => /Enhanced|Premium|Natural|Google|Siri/i.test(x.name) && !taken.has(x.name))
+      || vs.find((x) => !taken.has(x.name)) || null;
+    chosen[character] = v;
+    return v;
+  }
 
   /* ---------- TTS ---------- */
-  function speakText(text, character = "prof") {
+  // force = true plays even when voice output is off (the ▶ Play button on polished lines)
+  function speakText(text, character = "prof", { force = false } = {}) {
     return new Promise((resolve) => {
-      if (!st.tts || !text) return resolve("skipped");
+      if (!synth || !text || (!st.tts && !force)) return resolve("skipped");
       const p = PROFILE[character] || PROFILE.prof;
       const words = text.split(/\s+/).length;
       const estMs = (words / (2.6 * p.rate)) * 1000; // ~156 wpm at rate 1
@@ -38,9 +63,9 @@ const Voice = (() => {
       const timer = setTimeout(() => { synth.cancel(); finish("timeout"); }, estMs + 3000);
       try {
         const u = new SpeechSynthesisUtterance(text.replace(/\[[A-Z][\w-]*\]/g, "")); // don't read IDs
-        const vs = englishVoices();
-        if (vs.length) u.voice = vs[p.pick % vs.length];
-        u.pitch = p.pitch;
+        const v = voiceFor(character);
+        if (v) { u.voice = v; u.lang = v.lang; }
+        u.pitch = 1;
         u.rate = p.rate;
         u.onend = () => finish("end");
         u.onerror = () => finish("error"); // also fires on cancel in Chrome
@@ -169,7 +194,13 @@ const Voice = (() => {
   return {
     hasSTT: !!SR,
     enabled: () => st.tts,
-    setTTS: (on) => { st.tts = on && !!synth; if (!on) synth?.cancel(); },
+    hasTTS: !!synth,
+    setTTS: (on) => {
+      st.tts = on && !!synth;
+      if (!on) synth?.cancel();
+      try { localStorage.setItem(TTS_KEY, st.tts ? "on" : "off"); } catch { /* per-viewer convenience only */ }
+    },
+    voiceName: (character) => voiceFor(character)?.name || "browser default",
     listenEnabled: () => st.listen,
     setListen: (on, reason = "") => { st.listen = on && !!SR; st.reason = reason; },
     reason: () => st.reason,
