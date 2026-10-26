@@ -3,8 +3,8 @@
   "name": "MGT 411 Customer",
   "professor": {
     "name": "Prof. Shin",
-    "style": "TODO(user): describe the professor's style in your own words.",
-    "signature_moves": "",
+    "style": "Socratic case-method discussion leader. Cold calls should be expected, and quality matters more than quantity. Pushes students to find root causes, use specific data from the case, make a concrete recommendation with pros and cons, and connect it to lecture frameworks (5C, STP, 4P). Warm but demanding; asks 'why?' and 'what's the evidence?' often.",
+    "signature_moves": "Asks 'What if…?' to test a strategy; asks who the target customer really is.",
     "sliders": {
       "cold_call": 3,
       "follow_up_pressure": 3,

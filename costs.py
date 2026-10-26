@@ -44,10 +44,12 @@ def session_summary(trace: list[dict], pack_usage: dict | None, turns: int) -> d
 
 
 def completed_sessions() -> list[dict]:
+    """Measured sessions, including archived test runs (data/sessions_archive/): their usage is real
+    even though they are excluded from the previous-session comparison."""
     out = []
-    if not config.SESSIONS_DIR.exists():
-        return out
-    for p in sorted(config.SESSIONS_DIR.glob("*.json")):
+    files = [p for d in (config.SESSIONS_DIR, config.SESSIONS_DIR.parent / "sessions_archive") if d.exists()
+             for p in sorted(d.glob("*.json"))]
+    for p in files:
         try:
             d = json.loads(p.read_text())
         except (OSError, json.JSONDecodeError):

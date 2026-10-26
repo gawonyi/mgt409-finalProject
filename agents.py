@@ -21,11 +21,14 @@ class LLMAgents:
     def prefix(self, o: Orchestrator) -> str:
         if self._prefix is None:
             prof = self.course.get("professor", {})
+            style = prof.get("style") or ""
+            if style.strip().upper().startswith("TODO"):  # unfilled placeholder never reaches the model
+                style = ""
             roles = "\n".join(f"- {c.id} = {c.name}, {c.persona}" for c in o.classmates)
             self._prefix = f"""You are part of Hand Up!, a mock MBA case discussion used for speaking practice.
 
 PEOPLE
-- prof = {o.prof_name}, the professor. Style: {prof.get('style') or 'Socratic, warm but demanding.'}
+- prof = {o.prof_name}, the professor. Style: {style or 'Socratic, warm but demanding.'}
   Signature moves: {prof.get('signature_moves') or 'none given'}.
   Sliders (1-5): {prof.get('sliders', {})}
 - me = the human student practicing (address them as "you", never by a name or as "You,").
@@ -142,9 +145,10 @@ RULES FOR EVERYONE
     def remark(self, o: Orchestrator, cid: str) -> tuple[str, list[str]]:
         c = next(c for c in o.classmates if c.id == cid)
         role = (f"You are {c.name} ({c.id}), {c.persona} The professor called on you. "
-                f"Answer in under {config.WORD_CAPS['classmate']} words, 2-4 sentences, in character. "
+                f"Answer in under {config.WORD_CAPS['classmate']} words, 2-3 short spoken sentences, in character. "
+                "Make ONE point well rather than several. "
                 "Build on or push back on someone by name when it helps (builds_on = their name or null). "
-                "Cite 1-3 Session Pack IDs in cited_ids and in the text.")
+                "Cite 1-2 Session Pack IDs in cited_ids and in the text.")
 
         def gen(feedback):
             task = "Say your remark now." + (f"\n{feedback}" if feedback else "")

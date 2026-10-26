@@ -42,11 +42,11 @@ MAX_OUTPUT_TOKENS = {
     "pack_builder": 2000,
     "professor": 160,    # ≤ 60 words + JSON
     "hands": 200,
-    "classmate": 220,    # ≤ 80 words + JSON
+    "classmate": 170,    # ≤ 50 words + JSON (PRD cap is 80; shorter keeps voice turns ~15 s)
     "coach": 1800,
     "check_model": 60,
 }
-WORD_CAPS = {"professor": 60, "classmate": 80}
+WORD_CAPS = {"professor": 60, "classmate": 50}
 
 # Cost-cut toggles (PRD §10); the UI can flip them per session
 COST_CUTS = {

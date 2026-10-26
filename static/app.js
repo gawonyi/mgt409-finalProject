@@ -12,7 +12,7 @@ const CUTS = {
   shared_prefix: "Same prompt + pack prefix first (cache-friendly)",
   batched_hands: "One batched hand-raise call per turn",
   recent_turns_only: "Send recent turns only",
-  output_caps: "Output caps (prof ≤60, classmate ≤80 words)",
+  output_caps: "Output caps (prof ≤60, classmate ≤50 words)",
   compact_prev_summary: "Coach reads a compact previous summary",
 };
 

@@ -47,8 +47,9 @@ Hand Up! switches to typing automatically and shows why.
 ## Try the demo
 
 1. On Home, click **Try the demo**. This loads the fictional *Brightloaf Bakery* case
-   (`samples/demo_case.md`, 2 pages + Exhibit 1), its 3 questions, and `samples/course_mgt411.json`
-   (the professor profile is a placeholder).
+   (`samples/demo_case.md`, 2 pages + Exhibit 1), its 3 questions, and `samples/course_mgt411.json`.
+   The professor style there is a short default drawn from the syllabus's participation and case-prep
+   guidance; describe your own professor in **Edit course**.
 2. Wait for "Pack ready" (≈10 s), tap your confidence (1–10), and click **Start class**.
 3. Press **Space** or **✋ Hand Up!** to raise your hand. Answer when it's your turn (speak, or type),
    or press **Pass**. **End class** ends at any time.
@@ -175,5 +176,6 @@ scripts/check_model.py   tests/
 ## Known limits
 
 - The gpt-6-luna prices in `config.py` are placeholders. Update them for exact dollar figures.
+- Classmate remarks are capped at 50 words (the PRD allows 80) so a spoken turn takes about 15 s.
 - Speech recognition quality depends on the browser; the Coach ignores obvious recognition errors.
 - Comparison is with the previous session only. A running summary is out of scope for v1.

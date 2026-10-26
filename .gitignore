@@ -10,3 +10,4 @@ cases/
 .pytest_cache/
 data/courses/
 .claude/
+data/sessions_archive/
