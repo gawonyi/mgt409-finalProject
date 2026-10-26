@@ -14,18 +14,18 @@ MGT 409 final project · Gawon Yi.
 Requirements: Python 3.11+ and Chrome (for voice). There is no Node and no build step.
 
 ```bash
-git clone https://github.com/gawonyi/hand-up.git
-cd hand-up
+git clone https://github.com/gawonyi/mgt409-finalProject.git
+cd mgt409-finalProject
 python3 -m pip install -r requirements.txt
 ```
 
 **API key.** Hand Up! reads `PORTKEY_API_KEY` from a `.env` file. It looks in the repo folder first,
-then **one folder above**, so a `.env` placed next to the `hand-up/` folder works without copying:
+then **one folder above**, so a `.env` placed next to the cloned folder works without copying:
 
 ```
 your-folder/
   .env            ← PORTKEY_API_KEY=...   (works)
-  hand-up/
+  mgt409-finalProject/
     .env          ← or here (git-ignored)
 ```
 
